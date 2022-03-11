@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'home_screen.dart';
 // import 'package:travel/constants/constants.dart';
 // import 'package:travel/presentation/screens/authentication/login_or_signup/login_or_signUp_screen.dart';
 // import 'package:travel/presentation/widgets/onBoarding_content/onBoarding_content.dart';
 
-
 class OnBoardingScreen extends StatefulWidget {
-
   @override
   _OnBoardingScreenState createState() => _OnBoardingScreenState();
 }
 
 class _OnBoardingScreenState extends State<OnBoardingScreen> {
-
-
   int currentPage = 0;
   // bool isLast = false;
 
   List<Map<String, String>> splashData = [
     {"text": 'Reading Is Life', "image": "assets/images/13258.jpg"},
-    {"text": 'Know New Information', "image": "assets/images/people-team.png"},
-    {"text": 'Feed Your Brain', "image": "assets/images/knowledgeeducation.png"},
+    {"text": 'Know New Information', "image": "assets/images/Library.jpg"},
+    {
+      "text": 'Feed Your Brain',
+      "image": "assets/images/knowledgeeducation.png"
+    },
     // {"text": 'Improve Yourself', "image": "assets/images/page2 (2).jpg"},
     // {"text": 'Spend Time Developing', "image": "assets/images/page3.jpg"},
   ];
@@ -34,20 +34,17 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
       backgroundColor: Colors.white,
       body: Container(
         width: double.infinity,
-        height: h*0.8,
+        height: h * 0.8,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            SizedBox(height: h * 0.3),
-            // SizedBox(height: h * 0.04,),
-
+            SizedBox(height: h * 0.2),
             Expanded(
               flex: 3,
               child: PageView.builder(
                 physics: BouncingScrollPhysics(),
-                onPageChanged: (value)
-                {
+                onPageChanged: (value) {
                   setState(() {
                     currentPage = value;
                   });
@@ -59,14 +56,14 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                 ),
               ),
             ),
-            // SizedBox(height: h * 0.035),
-
+            SizedBox(height: h * 0.035),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
                 splashData.length,
-                    (index) => buildOnBoardingDot(index: index,currentPage: currentPage,context: context),
+                (index) => buildOnBoardingDot(
+                    index: index, currentPage: currentPage, context: context),
               ),
             ),
             SizedBox(
@@ -75,29 +72,30 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             defaultButton(
                 title: 'GUIED ME',
                 textColor: Colors.white,
-                onPressed:(){
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeScreen()));
+                onPressed: () async {
+                  SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  prefs.setBool('is_onboearding', true);
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => HomeScreen()));
                 },
                 fontSize: w * 0.05,
                 height: h * 0.07,
                 width: w * 0.5,
                 color: Color(0xff3366cc),
-                boxShadow:  [
+                boxShadow: [
                   BoxShadow(
                     color: Colors.grey.shade500,
                     blurRadius: 5,
                     offset: Offset(0, 5), // Shadow position
                   ),
-                ]
-            ),
+                ]),
           ],
         ),
       ),
     );
   }
 }
-
-
 
 class SplashContent extends StatelessWidget {
   final String text, image;
@@ -115,43 +113,35 @@ class SplashContent extends StatelessWidget {
         Image.asset(
           image,
           height: h * 0.3,
-          width: w  * 1,
+          width: w * 1,
           fit: BoxFit.cover,
-
         ),
-        SizedBox(height: 1,),
-        // SizedBox(height: 10,),
         Text(
           text,
           style: TextStyle(
-              fontSize: 25, fontWeight: FontWeight.bold,color: Colors.black87),
+              fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black87),
         ),
       ],
     );
   }
 }
 
-
-AnimatedContainer buildOnBoardingDot({required int index,required int currentPage,required context}) {
-
+AnimatedContainer buildOnBoardingDot(
+    {required int index, required int currentPage, required context}) {
   // double h = MediaQuery.of(context).size.height;
   double w = MediaQuery.of(context).size.width;
 
   return AnimatedContainer(
-    duration: Duration(
-        milliseconds:  250
-    ),
+    duration: Duration(milliseconds: 250),
     margin: EdgeInsets.only(right: w * 0.03),
     height: 5,
     width: currentPage == index ? w * 0.06 : w * 0.03,
     decoration: BoxDecoration(
-      color: currentPage == index ?  Color(0xff3366cc) : Colors.grey.shade400 ,
+      color: currentPage == index ? Color(0xff3366cc) : Colors.grey.shade400,
       borderRadius: BorderRadius.circular(30),
     ),
   );
 }
-
-
 
 Widget defaultButton({
   required String title,
@@ -163,25 +153,27 @@ Widget defaultButton({
   required Color textColor,
   List<BoxShadow>? boxShadow,
   EdgeInsetsGeometry? margin,
+}) =>
+    Container(
+      height: height,
+      width: width,
+      margin: margin,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: boxShadow,
 
-})=>Container(
-  height: height,
-  width: width,
-  margin: margin,
-  decoration: BoxDecoration(
-    color: color,
-    borderRadius: BorderRadius.circular(30),
-    boxShadow:boxShadow,
-
-    //#3A0CA3
-  ),
-  child: TextButton(onPressed: onPressed,
-    child: Text(title,
-      style: TextStyle(
-          color: textColor,
-          fontSize: fontSize,
-          fontFamily: 'Poppins',
-          fontWeight: FontWeight.w700
+        //#3A0CA3
       ),
-    ),),
-);
+      child: TextButton(
+        onPressed: onPressed,
+        child: Text(
+          title,
+          style: TextStyle(
+              color: textColor,
+              fontSize: fontSize,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w700),
+        ),
+      ),
+    );
